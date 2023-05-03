@@ -1,0 +1,67 @@
+"use client";
+import { User } from "@prisma/client";
+//
+// const useAuth = () => {
+//   const signIn = (dto: {
+//     email: string;
+//     password: string;
+//   }): Promise<(User & { token: string }) | null> => {
+//     return fetch("/api/auth/login", {
+//       method: "POST",
+//       body: JSON.stringify(dto),
+//       credentials: "include",
+//     })
+//       .then((res) => {
+//         if (res.status === 200) {
+//           return res.json();
+//         }
+//         return Promise.reject(`Failed ${res.status}`);
+//       })
+//       .then((data) => {
+//         alert("Success");
+//         return data;
+//       })
+//       .catch((err) => {
+//         alert(err.message);
+//         return null;
+//       });
+//   };
+//
+//   const signUp = () => {};
+//   const signOut = () => {};
+//
+//   return {
+//     signIn,
+//     signOut,
+//     signUp,
+//   };
+// };
+// export default useAuth;
+
+export const signIn = (dto: {
+  email: string;
+  password: string;
+}): Promise<(User & { token: string }) | null> => {
+  return fetch("/api/auth/login", {
+    method: "POST",
+    body: JSON.stringify(dto),
+    credentials: "include",
+  })
+    .then((res) => {
+      if (res.status === 200) {
+        return res.json();
+      }
+      return Promise.reject(`Failed ${res.status}. ${res.statusText}`);
+    })
+    .then((data) => {
+      alert("Success");
+      return data;
+    })
+    .catch((err) => {
+      alert(err.message);
+      return null;
+    });
+};
+
+export const signUp = () => {};
+export const signOut = () => {};
