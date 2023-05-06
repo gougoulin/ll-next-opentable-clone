@@ -24,16 +24,15 @@ export async function POST(req: NextRequest) {
   // check password
   if (!(await verifyPassword(body.password, user.password))) return invalid();
   // create jwt token
-  const token = createToken({ id: user.id, email: user.email });
+  const token = createToken({ id: user.id, email: user.email, firstName: user.firstName });
   // return token
   const resp = await NextResponse.json(
-    { token, email: user.email },
+    { token, email: user.email, firstName: user.firstName },
     {
       status: 200,
     }
   );
   resp.cookies.set({ name: "jwt", value: token, httpOnly: true, maxAge: 3600 });
-  console.log({ cookies: resp.cookies });
   return resp;
   // return NextResponse.json({ token, email: user.email }, { status: 200 }).cookies.set(
   //   "jwt",

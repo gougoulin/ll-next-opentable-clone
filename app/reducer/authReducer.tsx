@@ -13,6 +13,7 @@ export enum AuthReducerAction {
 interface AuthDto {
   token: string;
   email: string;
+  firstName: string;
 }
 
 // export type AuthStateAction =
@@ -78,7 +79,6 @@ export const authReducer: Reducer<AuthState, AuthStateAction> = (state, action) 
     case AuthReducerAction.LOADING_END:
       return { ...state, isLoading: false };
     case AuthReducerAction.ADD_ERROR:
-      console.log({ action });
       return { ...state, error: action.payload };
     case AuthReducerAction.REMOVE_ERROR:
       return { ...state, error: null };

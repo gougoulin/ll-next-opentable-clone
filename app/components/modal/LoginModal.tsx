@@ -6,6 +6,8 @@ import { MouseEventHandler, useContext, useRef } from "react";
 import { AuthContext, DispatchContext } from "@/app/context/authContext";
 import { authActions } from "@/app/reducer/authReducer";
 import { signIn } from "@/app/hooks/useAuth";
+import validator from "validator";
+import { useRouter } from "next/navigation";
 
 export default function LoginModal() {
   const dispatch = useContext(DispatchContext);
@@ -13,6 +15,7 @@ export default function LoginModal() {
   // ref to input fields
   const emailInputRef = useRef<HTMLInputElement>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
   // modal main content
   const mainContent = (
     <>
@@ -29,25 +32,29 @@ export default function LoginModal() {
     if (dispatch == null) throw new Error("dispatch is not defined");
     if (emailInputRef.current == null) return;
     if (passwordInputRef.current == null) return;
-    if (emailInputRef.current.value === "") {
-      dispatch(authActions.addError("Email is required") as any);
-      return;
-    }
-    if (passwordInputRef.current.value === "") {
-      dispatch(authActions.addError("Password is required") as any);
+    const dto = {
+      email: emailInputRef.current.value,
+      password: passwordInputRef.current.value,
+    };
+    if (!validator.isEmail(dto.email)) {
+      dispatch(authActions.addError("Valid email is required"));
       return;
     }
     // remove current errors to prevent it from showing
     dispatch(authActions.removeError());
     dispatch(authActions.loadingStart());
     // before sending sign in request
-    const user = await signIn({
-      email: emailInputRef.current.value,
-      password: passwordInputRef.current.value,
-    });
+    const user = await signIn(dto);
     // after loading
     dispatch(authActions.loadingEnd());
-    if (user !== null) dispatch(authActions.signIn({ email: user.email, token: user.token }));
+    if (user !== null) {
+      dispatch(
+        authActions.signIn({ email: user.email, token: user.token, firstName: user.firstName })
+      );
+      router.refresh();
+    } else {
+      dispatch(authActions.addError("Invalid email / password"));
+    }
   };
   return (
     <ModalBase

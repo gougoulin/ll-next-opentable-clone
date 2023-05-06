@@ -54,14 +54,27 @@ export const signIn = (dto: {
       return Promise.reject(`Failed ${res.status}. ${res.statusText}`);
     })
     .then((data) => {
-      alert("Success");
       return data;
     })
     .catch((err) => {
-      alert(err.message);
       return null;
     });
 };
 
 export const signUp = () => {};
-export const signOut = () => {};
+export const signOut = () => {
+  return fetch("/api/auth/signout", {
+    method: "POST",
+    credentials: "include",
+  })
+    .then((res) => {
+      return res.json();
+    })
+    .then((data) => {
+      return !!data;
+    })
+    .catch((err) => {
+      console.log(err.message);
+      return false;
+    });
+};

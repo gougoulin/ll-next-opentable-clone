@@ -2,11 +2,14 @@
 import ModalBase from "@/app/components/modal/ModalBase";
 import PasswordInput from "@/app/components/modal/PasswordInput";
 import EmailInput from "@/app/components/modal/EmailInput";
-import { useRef, MouseEventHandler } from "react";
+import { useRef, MouseEventHandler, useContext } from "react";
 import ConfirmPasswordInput from "@/app/components/modal/ConfirmPasswordInput";
 import ModalInput from "@/app/components/modal/ModalInput";
+import { AuthContext, DispatchContext } from "@/app/context/authContext";
 
 const SignUpModal = () => {
+  const dispatch = useContext(DispatchContext);
+  const { isLoading, error } = useContext(AuthContext);
   // input fields references
   const emailInputRef = useRef<HTMLInputElement>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
@@ -90,6 +93,8 @@ const SignUpModal = () => {
 
   return (
     <ModalBase
+      isLoading={isLoading}
+      errorMsg={error}
       primaryTitle="sign up"
       secondaryTitle="create your account"
       mainContent={mainContent}
