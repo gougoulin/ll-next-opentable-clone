@@ -1,0 +1,140 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum PRICE {
+  CHEAP
+  REGULAR
+  EXPENSIVE
+}
+
+model Restaurant {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  mainImage   String   @map("main_image")
+  description String
+  images      String[]
+  openTime    String   @map("open_time")
+  closeTime   String   @map("close_time")
+  slug        String   @unique
+  price       PRICE
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  locationId String    @map("location_id") @db.ObjectId
+  location   Location  @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  cuisineId  String    @map("cuisine_id") @db.ObjectId
+  cuisine    Cuisine   @relation(fields: [cuisineId], references: [id], onDelete: Cascade)
+  items      Item[]
+  reviews    Review[]
+  bookings   Booking[]
+  tables     Table[]
+}
+
+model Item {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  price        String
+  description  String
+  restaurantId String   @db.ObjectId
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+}
+
+model Location {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  restaurants Restaurant[]
+}
+
+model Cuisine {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  restaurants Restaurant[]
+}
+
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  username  String?
+  password  String
+  email     String   @unique
+  phone     String?
+  city      String?
+  firstName String   @map("first_name")
+  lastName  String   @map("last_name")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  reviews   Review[]
+}
+
+model Review {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  text      String
+  rating    String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  firstName String @map("first_name")
+  lastName  String @map("last_name")
+
+  userId       String     @map("user_id") @db.ObjectId
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  restaurantId String     @map("restaurant_id") @db.ObjectId
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+}
+
+model Booking {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  guests           Int      @db.Int
+  bookingEmail     String   @map("booking_email")
+  bookingPhone     String   @map("booking_phone")
+  bookingFirstName String   @map("booking_first_name")
+  bookingLastName  String   @map("booking_last_name")
+  bookingTime      DateTime @map("booking_time")
+  bookingRequest   String   @map("booking_request")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  restaurantId  String          @map("restaurant_id") @db.ObjectId
+  restaurant    Restaurant      @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  bookingTables Booking_Table[]
+}
+
+model Table {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  seats     Int
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  restaurantId  String          @map("restaurant_id") @db.ObjectId
+  restaurant    Restaurant      @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  bookingTables Booking_Table[]
+}
+
+model Booking_Table {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  bookingId String   @map("booking_id") @db.ObjectId
+  tableId   String   @map("table_id") @db.ObjectId
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  booking   Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  table     Table    @relation(fields: [tableId], references: [id], onDelete: Cascade)
+
+  @@unique([bookingId, tableId])
+}
