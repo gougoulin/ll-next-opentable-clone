@@ -13,6 +13,7 @@ const NavBar = () => {
   const ctx = useContext(AuthContext);
   const dispatch = useContext(DispatchContext);
   const router = useRouter();
+  console.log({ctx})
   return (
     <div className="flex flex-row items-center justify-between py-2 pl-8 pr-4">
       <div className="text-lg font-bold">
@@ -28,9 +29,13 @@ const NavBar = () => {
           {ctx.user ? (
             <button
               onClick={() => {
-                signOut().then(() => {
-                  dispatch && dispatch(authActions.signOut());
-                });
+                signOut()
+                  .then(() => {
+                    dispatch && dispatch(authActions.signOut());
+                  })
+                  .catch((err) => {
+                    throw err;
+                  });
               }}
               className="rounded border border-red-500 p-2 px-3 text-red-500"
             >

@@ -12,9 +12,14 @@ export default function useMe(dispatch: Dispatch<any>) {
       credentials: "include",
     })
       .then((res) => {
-        return res.json();
+        if (res.status === 200) {
+          return res.json();
+        } else {
+          return null;
+        }
       })
       .then((data) => {
+        console.log({data})
         if (data != null) {
           dispatch &&
             dispatch(

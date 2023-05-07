@@ -2,12 +2,13 @@
 import { partySize } from "@/app/data";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs, { Dayjs } from "dayjs";
-import { LocalizationProvider, TimePicker } from "@mui/x-date-pickers";
+import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { MouseEventHandler, useState } from "react";
 import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import availableTimes from "@/app/data/availableTime";
 import validator from "validator";
+import Link from "next/link";
 
 export default function RestaurantBooking({
   openTime,
@@ -156,6 +157,7 @@ export default function RestaurantBooking({
                 <ul className={"flex flex-row flex-wrap gap-3"}>
                   {availability &&
                     availability.map((elem) => {
+                      const time = elem.time.replace(/:\d{2}\+.*$/, "");
                       return (
                         <li
                           className={
@@ -165,7 +167,13 @@ export default function RestaurantBooking({
                           }
                           key={elem.time}
                         >
-                          {elem.time.replace(/:\d{2}\+.*$/, "")}
+                          <Link
+                            href={`/restaurant/${slug}/reserve?bookingtime=${
+                              bookingDate + time
+                            }&bookingsize=${size}`}
+                          >
+                            {time}
+                          </Link>
                         </li>
                       );
                     })}

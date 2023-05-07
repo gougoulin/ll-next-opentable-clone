@@ -73,7 +73,7 @@ export const authReducer: Reducer<AuthState, AuthStateAction> = (state, action) 
     case AuthReducerAction.SIGN_IN:
       return { isLoading: false, user: action.payload, error: null };
     case AuthReducerAction.SIGN_OUT:
-      return initialState;
+      return { isLoading: false, user: null, error: null };
     case AuthReducerAction.LOADING_START:
       return { ...state, isLoading: true };
     case AuthReducerAction.LOADING_END:

@@ -10,5 +10,5 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ email: decode?.email, firstName: decode?.firstName });
     }
   }
-  return NextResponse.json({ data: null });
+  return NextResponse.json(null);
 }
