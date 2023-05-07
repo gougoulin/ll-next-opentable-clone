@@ -1,7 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
-import { extractInput, findAvailableTales } from "@/app/services/restaurant.service";
-import dayjs from "dayjs";
+import {
+  extractInput,
+  findAvailableTales,
+  getRestaurantBySlug,
+} from "@/app/services/restaurant.service";
+import dayjs, { Dayjs } from "dayjs";
 import { reserve } from "@/app/services/reserve.service";
+import { dbClient } from "@/app/providers/prisma.client";
+import { Booking_Table } from ".prisma/client";
+
+async function findTablesToReserve(bookingTimeObj: Dayjs, bookingSize: number, slug: string) {
+  // reused the function created for availability
+  const available = await findAvailableTales(bookingTimeObj, slug);
+  if (available === null) return null;
+  // filter the available to find the exact object needed
+  const tablesAtBookingTime = available.find(
+    (elem) => elem.time === bookingTimeObj.format("HH:mm:ssZ")
+  );
+  // next is to find out which table should be reserved
+  if (tablesAtBookingTime == undefined) return null;
+  // 1. sort the tables by seats in descendent order
+  const sortedTables = tablesAtBookingTime.tables.sort((a, b) => b.seats - a.seats);
+  // 2. reserve tables making the total seats the smallest
+  // For simplicity, assume tables have seats 2 or 4
+  const reservedTables: string[] | null = reserve["simple"](sortedTables, bookingSize);
+  return reservedTables;
+}
 
 export async function POST(req: NextRequest, params: { params: { slug: string } }) {
   const {
@@ -13,9 +37,39 @@ export async function POST(req: NextRequest, params: { params: { slug: string } 
     bookingTime,
     bookingRequest,
   } = await req.json();
-  
-  console.log(params);
-  return NextResponse.json({});
+  const restaurant = await getRestaurantBySlug(params.params.slug);
+  if (restaurant == null) return NextResponse.json("No restaurant found");
+  const dateTimeObj = dayjs(bookingTime);
+  const reservedTables = await findTablesToReserve(dateTimeObj, +guests, params.params.slug);
+  if (reservedTables == null) return NextResponse.json("No tables available");
+  const booking = await dbClient.booking.create({
+    data: {
+      guests,
+      bookingEmail,
+      bookingPhone,
+      bookingFirstName,
+      bookingLastName,
+      bookingTime: dateTimeObj.toDate(),
+      bookingRequest: bookingRequest ?? "",
+      restaurantId: restaurant.id,
+    },
+  });
+  const rows: { bookingId: string; tableId: string }[] = reservedTables.map((it) => {
+    return {
+      bookingId: booking.id,
+      tableId: it,
+    };
+  });
+  const booking2Table = await dbClient.booking_Table.createMany({
+    data: rows,
+  });
+  return NextResponse.json({
+    status: "complete",
+    data: {
+      booking,
+      booking2Table,
+    },
+  });
 }
 
 export async function GET(req: NextRequest, params: { params: { slug: string } }) {
@@ -23,19 +77,10 @@ export async function GET(req: NextRequest, params: { params: { slug: string } }
   if (bookingSize === null || bookingTime === null) {
     return NextResponse.json("bookingsize and bookingtime are required", { status: 400 });
   }
-  // reused the function created for availability
-  const available = await findAvailableTales(bookingTimeObj, params.params.slug);
-  if (available === null) return NextResponse.json({});
-  // filter the available to find the exact object needed
-  const tablesAtBookingTime = available.find(
-    (elem) => elem.time === bookingTimeObj.format("HH:mm:ssZ")
+  const reservedTables = await findTablesToReserve(
+    bookingTimeObj,
+    +bookingSize,
+    params.params.slug
   );
-  // next is to find out which table should be reserved
-  if (tablesAtBookingTime == undefined) return NextResponse.json("no tables available");
-  // 1. sort the tables by seats in descendent order
-  const sortedTables = tablesAtBookingTime.tables.sort((a, b) => b.seats - a.seats);
-  // 2. reserve tables making the total seats the smallest
-  // For simplicity, assume tables have seats 2 or 4
-  const reservedTables: string[] | null = reserve["simple"](sortedTables, +bookingSize);
   return NextResponse.json({ reservedTables: reservedTables });
 }
