@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 const Stars = ({ rating, total }: { rating: number; total?: number }) => {
   const intRating = Math.floor(rating);
   const size = 12;

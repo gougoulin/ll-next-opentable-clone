@@ -12,11 +12,11 @@ const Header = () => {
         </h2>
         <div className="flex flex-row justify-center gap-4">
           <div>
-            <input className="w-72 rounded py-3" type="date" />
-            <input className="rounded py-3" type="time" />
-            <select className="rounded-r py-3">
-              <option>2 people</option>
-            </select>
+            {/*<input className="w-72 rounded py-3" type="date" />*/}
+            {/*<input className="rounded py-3" type="time" />*/}
+            {/*<select className="rounded-r py-3">*/}
+            {/*  <option>2 people</option>*/}
+            {/*</select>*/}
           </div>
           <SearchButton buttonText="Let's go" />
         </div>
