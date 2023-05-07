@@ -1,8 +1,8 @@
 import handler from "./seed";
-import { NextApiRequest, NextApiResponse } from "next";
+import {NextRequest } from "next/server";
 
-export async function GET(req: NextApiRequest, res: NextApiResponse) {
-  await handler(req, res);
-  console.log("seed.js done!")
+export async function GET(req: NextRequest) {
+  await handler(req, undefined);
+  console.log("seed.js done!");
   return new Response("Hello, seed.js!");
 }
