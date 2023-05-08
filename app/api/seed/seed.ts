@@ -1,13 +1,14 @@
 // Next.js API route.ts support: https://nextjs.org/docs/api-routes/introduction
 import { PRICE, PrismaClient } from "@prisma/client";
 import { NextRequest } from "next/server";
+import {dbClient} from "@/app/providers/prisma.client";
 
-const prisma = new PrismaClient();
 type Data = {
   name: string;
 };
 
 export default async function handler(req: NextRequest, res: any) {
+  const prisma = dbClient;
   // await prisma.table.deleteMany();
   await prisma.review.deleteMany({});
   await prisma.item.deleteMany();
