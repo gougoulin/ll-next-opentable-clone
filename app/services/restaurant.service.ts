@@ -3,7 +3,7 @@ import { Booking_Table, Restaurant } from ".prisma/client";
 import { PRICE, Review } from "@prisma/client";
 import dayjs, { Dayjs } from "dayjs";
 import availableTimes from "@/app/data/availableTime";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 const getRestaurants = () => {
   return dbClient.restaurant.findMany({
@@ -244,8 +244,7 @@ const findAvailableTales = async (bookingTimeObj: Dayjs, slug: string) => {
   // 3.
   const bookingMap = getBookingMap(existBookings);
   // 5. filter the tables that were booked
-  const available = getTimeWithTables(bookingTimeObj, dateTimes, tables, bookingMap);
-  return available;
+  return getTimeWithTables(bookingTimeObj, dateTimes, tables, bookingMap);
 };
 
 const extractInput = (req: NextRequest) => {
