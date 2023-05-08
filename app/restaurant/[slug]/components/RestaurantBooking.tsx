@@ -9,6 +9,9 @@ import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from "@m
 import availableTimes from "@/app/data/availableTime";
 import validator from "validator";
 import Link from "next/link";
+import utc from "dayjs/plugin/utc";
+
+dayjs.extend(utc);
 
 export default function RestaurantBooking({
   openTime,
@@ -42,8 +45,8 @@ export default function RestaurantBooking({
     ? dateValue.format("YYYY-MM-DDT")
     : dayjs().format("YYYY-MM-DDT");
   // const open = dayjs(bookingDate + openTime.replace(/z$/i, ""));
-  const open = dayjs(bookingDate + openTime);
-  const close = dayjs(bookingDate + closeTime);
+  const open = dayjs(bookingDate + openTime.replace(/z$/i, ""));
+  const close = dayjs(bookingDate + closeTime.replace(/z$/i, ""));
   // const close = dayjs(bookingDate + closeTime.replace(/z$/i, ""));
   if (!dayjs.isDayjs(open) || !dayjs.isDayjs(close)) {
     alert("not a valid open/close time");
@@ -78,7 +81,9 @@ export default function RestaurantBooking({
         return Promise.reject(`Error ${res.status} ${res.statusText}`);
       })
       .then((data) => {
-        setAvailability(data);
+        if (Object.getOwnPropertyNames(data).length !== 0) {
+          setAvailability(data);
+        }
       })
       .catch((err) => {
         console.log(err);
@@ -136,10 +141,13 @@ export default function RestaurantBooking({
                       onChange={handleTimeChange}
                     >
                       {availableTimes(open, close, dayjs(bookingDate)).map((elem) => {
-                        const formated = elem.replace(/:\d{2}\+.*$/, "");
+                        const formattedTime = dayjs(bookingDate + elem).format("HH:mm");
                         return (
-                          <MenuItem key={`booking-time-select-option-${formated}`} value={formated}>
-                            {formated}
+                          <MenuItem
+                            key={`booking-time-select-option-${formattedTime}`}
+                            value={formattedTime}
+                          >
+                            {formattedTime}
                           </MenuItem>
                         );
                       })}

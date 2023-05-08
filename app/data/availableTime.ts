@@ -7,7 +7,7 @@ export default function availableTimes(open: Dayjs, close: Dayjs, now = dayjs())
   if (!start.isValid() || !value.isValid() || !close.isValid()) throw Error("Invalid date time");
   while (true) {
     if (value.isBefore(now)) continue; // skip past times
-    result.push(value.format("HH:mm:ssZ")); // UTC time
+    result.push(value.format("HH:mm:ss")); // UTC time
     value = value.add(30, "minute");
     if (!value.isValid()) throw Error("Invalid date time");
     if (value.isAfter(close)) break; // stop at close time

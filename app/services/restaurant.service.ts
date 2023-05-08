@@ -120,8 +120,8 @@ const getExistBookings = async (bookingTimeObj: Dayjs, dateTimes: string[]) => {
   return dbClient.booking.findMany({
     where: {
       bookingTime: {
-        gte: new Date(bookingTimeObj.format("YYYY-MM-DDT") + dateTimes[0]),
-        lte: new Date(bookingTimeObj.format("YYYY-MM-DDT") + dateTimes[dateTimes.length - 1]),
+        gte: dayjs(bookingTimeObj.format("YYYY-MM-DDT") + dateTimes[0]).toDate(),
+        lte: dayjs(bookingTimeObj.format("YYYY-MM-DDT") + dateTimes[dateTimes.length - 1]).toDate(),
       },
     },
     select: {
@@ -234,8 +234,8 @@ const findAvailableTales = async (bookingTimeObj: Dayjs, slug: string) => {
   // 1. find adjacent booking times
   // Must be the same day
   const dateTimes = getAdjacentTimes(
-    dayjs(bookingTimeObj.format("YYYY-MM-DDT") + openTime),
-    dayjs(bookingTimeObj.format("YYYY-MM-DDT") + closeTime),
+    dayjs(bookingTimeObj.format("YYYY-MM-DDT") + openTime.replace(/z$/gi, "")),
+    dayjs(bookingTimeObj.format("YYYY-MM-DDT") + closeTime.replace(/z$/gi, "")),
     bookingTimeObj
   );
   if (dateTimes.length === 0) return null;
@@ -264,5 +264,5 @@ export {
   searchRestaurantsbyFilter,
   getAvailability,
   findAvailableTales,
-  extractInput
+  extractInput,
 };
