@@ -1,5 +1,8 @@
 import dayjs, { Dayjs } from "dayjs";
 
+/**
+ * Returns an array of available times between open and close times
+ */
 export default function availableTimes(open: Dayjs, close: Dayjs, now = dayjs()): string[] {
   const start = open.set("minute", 0); // round up to the current hour
   let result: string[] = [];

@@ -19,7 +19,6 @@ export default function useMe(dispatch: Dispatch<any>) {
         }
       })
       .then((data) => {
-        console.log({data})
         if (data != null) {
           dispatch &&
             dispatch(

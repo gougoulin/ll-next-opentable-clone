@@ -175,13 +175,17 @@ export default function RestaurantBooking({
                           }
                           key={elem.time}
                         >
-                          <Link
-                            href={`/restaurant/${slug}/reserve?bookingtime=${
-                              bookingDate + time
-                            }&bookingsize=${size}`}
-                          >
-                            {time}
-                          </Link>
+                          {elem.available ? (
+                            <Link
+                              href={`/restaurant/${slug}/reserve?bookingtime=${
+                                bookingDate + time
+                              }&bookingsize=${size}`}
+                            >
+                              {time.replace(/:00$/, "")}
+                            </Link>
+                          ) : (
+                            time.replace(/:00$/, "")
+                          )}
                         </li>
                       );
                     })}

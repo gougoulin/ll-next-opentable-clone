@@ -132,6 +132,11 @@ const getExistBookings = async (bookingTimeObj: Dayjs, dateTimes: string[]) => {
   });
 };
 
+/**
+ * Get adjacent times +- 1.2 hours
+ * All datetime used in this function is in local time
+ * Datetime in database is in UTC and will be converted to local time when retrieved
+ */
 const getAdjacentTimes = (open: Dayjs, close: Dayjs, bookingTimeObj: Dayjs, len: number = 1.2) => {
   const before: Dayjs = bookingTimeObj.add(-1 * len, "hour");
   const after: Dayjs = bookingTimeObj.add(len, "hour");
@@ -234,8 +239,8 @@ const findAvailableTales = async (bookingTimeObj: Dayjs, slug: string) => {
   // 1. find adjacent booking times
   // Must be the same day
   const dateTimes = getAdjacentTimes(
-    dayjs(bookingTimeObj.format("YYYY-MM-DDT") + openTime.replace(/z$/gi, "")),
-    dayjs(bookingTimeObj.format("YYYY-MM-DDT") + closeTime.replace(/z$/gi, "")),
+    dayjs(bookingTimeObj.format("YYYY-MM-DDT") + openTime),
+    dayjs(bookingTimeObj.format("YYYY-MM-DDT") + closeTime),
     bookingTimeObj
   );
   if (dateTimes.length === 0) return null;

@@ -15,7 +15,7 @@ async function findTablesToReserve(bookingTimeObj: Dayjs, bookingSize: number, s
   if (available === null) return null;
   // filter the available to find the exact object needed
   const tablesAtBookingTime = available.find(
-    (elem) => elem.time === bookingTimeObj.format("HH:mm:ssZ")
+    (elem) => elem.time === bookingTimeObj.format("HH:mm:ss")
   );
   // next is to find out which table should be reserved
   if (tablesAtBookingTime == undefined) return null;
@@ -40,7 +40,6 @@ export async function POST(req: NextRequest, params: { params: { slug: string } 
   const restaurant = await getRestaurantBySlug(params.params.slug);
   if (restaurant == null) return NextResponse.json("No restaurant found", { status: 404 });
   const dateTimeObj = dayjs(bookingTime);
-  console.log(dateTimeObj.toISOString())
   const reservedTables = await findTablesToReserve(dateTimeObj, +guests, params.params.slug);
   if (reservedTables == null) return NextResponse.json("No tables available", { status: 404 });
   const booking = await dbClient.booking.create({

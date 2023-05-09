@@ -56,7 +56,7 @@ export default function ReservationCard({
         bookingPhone: phoneRef?.current && phoneRef.current.value,
         bookingFirstName: firstNameRef?.current && firstNameRef.current.value,
         bookingLastName: lastNameRef?.current && lastNameRef?.current.value,
-        bookingTime: dayjs(bookingTime).format("YYYY-MM-DDTHH:mm:ssZ"),
+        bookingTime: dayjs(bookingTime).toString(),
         bookingRequest: requestRef?.current == null ? "" : requestRef.current.value,
         restaurantId,
       }),
@@ -72,7 +72,7 @@ export default function ReservationCard({
         return res.json();
       })
       .then((data) => {
-        console.log(data);
+        // console.log(data);
       })
       .catch((err) => {
         setErrors([err.message]);
